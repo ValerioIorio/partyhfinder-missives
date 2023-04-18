@@ -1,0 +1,84 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '2.7.6'
+	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+	id "org.openapi.generator" version "6.2.0"
+	id "org.sonarqube" version "3.0"
+}
+
+group = 'com.personal.app'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenLocal()
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'com.partyh.finder:common:0.0.1-SNAPSHOT'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springdoc:springdoc-openapi-ui:1.6.13'
+	implementation 'org.openapitools:jackson-databind-nullable:0.2.4'
+	implementation 'io.springfox:springfox-swagger2:3.0.0'
+	implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
+	implementation group: 'org.modelmapper', name: 'modelmapper', version: '3.0.0'
+	implementation group: 'javax.ws.rs', name: 'javax.ws.rs-api', version: '2.1.1'
+	implementation group: 'org.mockito', name: 'mockito-core', version: '4.8.0'
+	implementation group: 'com.google.code.gson', name: 'gson', version: '2.10'
+	runtimeOnly 'mysql:mysql-connector-java'
+	implementation 'org.postgresql:postgresql:42.3.1'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.9.1'
+	implementation 'com.google.code.findbugs:jsr305:3.0.2'
+	implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.3'
+	implementation group: 'org.json', name: 'json', version: '20090211'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+apply plugin: 'org.openapi.generator'
+
+openApiGenerate {
+	generatorName = "spring"
+	inputSpec = "$rootDir/src/main/resources/openapi/chats-api-definition-v3.0.yaml"
+	outputDir = "$buildDir/generated"
+	apiPackage = "com.personal.app.resources"
+	modelPackage = "com.personal.app.model"
+	configOptions = [
+			interfaceOnly: "true",
+			dateLibrary: "java8",
+			generateApis: "true",
+			generateModels: "true",
+			useTags:"true"
+
+	]
+	importMappings = [
+			"java.time.OffsetDateTime" :"java.time.LocalDateTime"
+	]
+	typeMappings  = [
+			"OffsetDateTime":"LocalDateTime"
+	]
+}
+
+compileJava.dependsOn tasks.openApiGenerate
+
+sourceSets.main.java.srcDirs = ['build/generated/src/main/java','src/main/java']
+
+bootRun {
+	jvmArgs=["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"]
+}

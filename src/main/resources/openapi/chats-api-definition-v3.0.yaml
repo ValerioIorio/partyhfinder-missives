@@ -1,0 +1,445 @@
+openapi: 3.0.0
+servers:
+  - url: 'http://localhost:9090'
+info:
+  description: aggiungere
+  version: 1.0.0
+  title: Swagger partyh-finder-users
+tags:
+  - name: Chat
+    description: Operations about Chat
+  - name: Missive
+    description: Operations about Missive
+paths:
+  /chat:
+    get:
+      tags:
+        - Chat
+      summary: Find all Chats
+      description: 'return a page of Chat'
+      operationId: findAllChat
+      parameters:
+        - name: pageSize
+          in: query
+          description: 'Limit number element for one page '
+          schema:
+            type: integer
+            format: int32
+        - name: numberOfPage
+          in: query
+          description: 'Number of page '
+          schema:
+            type: integer
+            format: int32
+        - name: descending
+          in: query
+          description: 'List order natural or reverse '
+          schema:
+            type: boolean
+        - name: sortBy
+          in: query
+          description: 'Sort list by value '
+          schema:
+            type: string
+        - name : name
+          in: query
+          description: 'name of the chat to search '
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatPageDTO'
+    post:
+      tags:
+        - Chat
+      summary: Add a new Chat
+      description: 'add an Chat on db'
+      operationId: addChat
+      requestBody:
+        description: Chat object that needs to be added to the database
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatDTO'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatDTO'
+        '400':
+          description: Validation exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorDTO'
+    put:
+      tags:
+        - Chat
+      summary: update an Chat
+      description: 'update an Chat on db'
+      operationId: updateChat
+      requestBody:
+        description: Chat object that needs to be updated to the database
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatDTO'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatDTO'
+        '400':
+          description: Validation exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorDTO'
+  /chat/{id}:
+    delete:
+      tags:
+        - Chat
+      summary: delete a Chat
+      description: 'delete a Chat by id'
+      operationId: deleteChat
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 'id of the Chat to delete '
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Chat deleted
+        '400':
+          description: Validation exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorDTO'
+    get:
+      tags:
+        - Chat
+      summary: get an Chat
+      description: 'get a Chat by id'
+      operationId: getChat
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 'id of the Chat to get '
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatDTO'
+        '400':
+          description: Validation exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorDTO'
+  /missive:
+    get:
+      tags:
+        - Missive
+      summary: Find all Missive
+      description: 'return a page of Missive'
+      operationId: findAllMissive
+      parameters:
+        - name: pageSize
+          in: query
+          description: 'Limit number element for one page '
+          schema:
+            type: integer
+            format: int32
+        - name: numberOfPage
+          in: query
+          description: 'Number of page '
+          schema:
+            type: integer
+            format: int32
+        - name: descending
+          in: query
+          description: 'List order natural or reverse '
+          schema:
+            type: boolean
+        - name: sortBy
+          in: query
+          description: 'Sort list by value '
+          schema:
+            type: string
+        - name: senderId
+          in: query
+          description: 'Filter by senderId '
+          schema:
+            type: integer
+            format: int64
+        - name: receiverId
+          in: query
+          description: 'Filter by receiverId '
+          schema:
+            type: integer
+            format: int64
+        - name : text
+          in: query
+          description: 'Filter by text '
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MissivePageDTO'
+    post:
+      tags:
+        - Missive
+      summary: Add a new Missive
+      description: 'add an Missive on db'
+      operationId: addMissive
+      requestBody:
+        description: Missive object that needs to be added to the database
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MissiveDTO'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MissiveDTO'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorDTO'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundErrorDTO'
+    put:
+      tags:
+        - Missive
+      summary: update an Missive
+      description: 'update an Missive on db'
+      operationId: updateMissive
+      requestBody:
+        description: Missive object that needs to be updated to the database
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MissiveDTO'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MissiveDTO'
+        '400':
+          description: Validation exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorDTO'
+  /missive/{id}:
+    delete:
+      tags:
+        - Missive
+      summary: delete a Missive
+      description: 'delete a Missive by id'
+      operationId: deleteMissive
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 'id of the Missive to delete '
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Missive deleted
+        '400':
+          description: Validation exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorDTO'
+    get:
+      tags:
+        - Missive
+      summary: get an Missive
+      description: 'get a Missive by id'
+      operationId: getMissive
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 'id of the Missive to get '
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MissiveDTO'
+        '400':
+          description: Validation exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorDTO'
+components:
+  schemas:
+    ChatDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: 'id univoco per la chat'
+        name:
+          type: string
+          description: 'nome della chat'
+        userStringIds:
+          type: string
+          description: 'id degli utenti che partecipano alla chat, separati da virgola'
+
+        createdAt:
+          type: string
+          format: date-time
+          description: 'data di creazione della chat'
+        updatedAt:
+          type: string
+          format: date-time
+          description: 'data di ultima modifica della chat'
+
+    ChatPageDTO:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChatDTO'
+        totalItems:
+          type: integer
+          format: int64
+          description: 'Numero totale degli elementi'
+        itemsPerPage:
+          type: integer
+          description: 'Numero di elementi nella pagina corrente'
+        totalPages:
+          type: integer
+          description: 'Numero totale di pagine'
+        currentPage:
+          type: integer
+          description: 'Pagina corrente'
+
+    MissiveDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: 'id univoco per il messaggio'
+        senderId:
+          type: integer
+          format: int64
+        chat:
+          $ref: '#/components/schemas/ChatDTO'
+        text:
+          type: string
+          description: 'testo del messaggio'
+        createdAt:
+          type: string
+          format: date-time
+          description: 'data di creazione del messaggio'
+        updatedAt:
+          type: string
+          format: date-time
+          description: 'data di ultima modifica del messaggio'
+        sentAt:
+          type: string
+          format: date-time
+          description: 'data di invio del messaggio'
+        readAt:
+          type: string
+          format: date-time
+          description: 'data di lettura del messaggio'
+        deletedAt:
+          type: string
+          format: date-time
+          description: 'data di cancellazione del messaggio'
+        read:
+          type: boolean
+          description: 'indicatore se il messaggio è stato letto o meno'
+
+    MissivePageDTO:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/MissiveDTO'
+        totalItems:
+          type: integer
+          format: int64
+          description: 'Numero totale degli elementi'
+        itemsPerPage:
+          type: integer
+          description: 'Numero di elementi nella pagina corrente'
+        totalPages:
+          type: integer
+          description: 'Numero totale di pagine'
+        currentPage:
+          type: integer
+          description: 'Pagina corrente'
+
+    ValidationErrorDTO:
+      type: object
+      properties:
+        field:
+          type: string
+          description: 'nome del campo che ha generato l errore'
+        message:
+          type: string
+          description: 'messaggio di errore'
+    NotFoundErrorDTO:
+      type: object
+      properties:
+        field:
+          type: string
+          description: 'nome del campo che ha generato l errore'
+        message:
+          type: string
+          description: 'messaggio di errore'
