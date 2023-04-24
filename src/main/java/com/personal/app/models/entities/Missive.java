@@ -25,8 +25,8 @@ public class Missive {
      @Column(name = "sender_id")
      private Long senderId;
 
-     @ManyToOne(fetch = FetchType.LAZY)
-     private Chat chat;
+     @Column(name = "chat_id")
+     private Long chatId;
 
      @Column(name = "created_at")
      private LocalDateTime createdAt;

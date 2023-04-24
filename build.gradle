@@ -6,6 +6,8 @@ plugins {
 	id "org.sonarqube" version "3.0"
 }
 
+
+
 group = 'com.personal.app'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
@@ -45,6 +47,8 @@ dependencies {
 	implementation 'com.google.code.findbugs:jsr305:3.0.2'
 	implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.3'
 	implementation group: 'org.json', name: 'json', version: '20090211'
+	implementation group: 'com.squareup.okhttp', name: 'okhttp', version: '2.7.5'
+
 }
 
 tasks.named('test') {

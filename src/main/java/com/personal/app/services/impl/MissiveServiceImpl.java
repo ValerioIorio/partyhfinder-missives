@@ -3,12 +3,10 @@ package com.personal.app.services.impl;
 import com.partyh.finder.common.exception.impl.PFIdNullException;
 import com.partyh.finder.common.utils.FilterUtil;
 import com.partyh.finder.common.validators.commons.ValidationUtils;
-import com.personal.app.models.entities.Chat;
 import com.personal.app.models.entities.Missive;
 import com.personal.app.model.MissiveDTO;
 import com.personal.app.model.MissivePageDTO;
 import com.personal.app.models.filters.MissiveFilter;
-import com.personal.app.repository.ChatRepository;
 import com.personal.app.repository.MissiveRepository;
 import com.personal.app.services.MissiveService;
 import com.personal.app.specifications.MissiveSpecification;
@@ -33,22 +31,16 @@ public class MissiveServiceImpl implements MissiveService {
         //check if the dto is null
         missiveValidator.validateId(missiveDTO.getId(), HttpMethod.POST);
         //check if the sender id and the chat id are not null
-        if (!ValidationUtils.isNull(missiveDTO.getChat().getId())) {
-            Optional<Chat> chatOptional = chatRepository.findById(missiveDTO.getChat().getId());
+        if (!ValidationUtils.isNull(missiveDTO.getChatId()) && !ValidationUtils.isNull(missiveDTO.getSenderId())){
 
             //validate
             missiveValidator.validate(
                     missiveDTO,
-                    HttpMethod.POST,
-                    new LinkedHashMap<>(
-                            Map.of( "chat", chatOptional.isPresent())
-                    )
+                    HttpMethod.POST
             );
-            Chat chat = chatOptional.get();
 
             //set default values
             Missive missive = mapper.map(missiveDTO, Missive.class);
-            missive.setChat(chat);
             missive.setCreatedAt(LocalDateTime.now());
             missive.setUpdatedAt(LocalDateTime.now());
             missive.setSentAt(LocalDateTime.now());
@@ -58,9 +50,44 @@ public class MissiveServiceImpl implements MissiveService {
             //save missive
             return mapper.map(this.missiveRepository.save(missive), MissiveDTO.class);
         } else {
-            throw new PFIdNullException("Chat Id cannot be null");
+            throw new PFIdNullException("Chat and Sender User Id cannot be null");
         }
 
+    }
+
+    @Override
+    public MissiveDTO updateMissive(MissiveDTO missiveDTO) {
+        //check if the dto is null
+        missiveValidator.validateId(missiveDTO.getId(), HttpMethod.PUT);
+
+        //skip validation on sender and chat ids because they are not changeable
+
+        //validate
+        Optional<Missive> missiveOptional = missiveRepository.findById(missiveDTO.getId());
+        missiveValidator.validate(
+                missiveDTO,
+                HttpMethod.PUT,
+                new LinkedHashMap<>(
+                        Map.of("missive", missiveOptional.isPresent())
+                )
+        );
+
+        //get the previous missive
+        Missive previousMissive = missiveOptional.get();
+        //map the new missive dto to an entity
+        Missive missive = mapper.map(missiveDTO, Missive.class);
+        //set not changeable values
+        missive.setSenderId(previousMissive.getSenderId());
+        missive.setChatId(previousMissive.getChatId());
+        missive.setCreatedAt(previousMissive.getCreatedAt());
+        missive.setSentAt(previousMissive.getSentAt());
+        missive.setReadAt(previousMissive.getReadAt());
+        missive.setDeletedAt(previousMissive.getDeletedAt());
+        missive.setRead(previousMissive.isRead());
+        //set default values
+        missive.setUpdatedAt(LocalDateTime.now());
+        //save missive
+        return mapper.map(this.missiveRepository.save(missive), MissiveDTO.class);
     }
 
     @Override
@@ -99,36 +126,6 @@ public class MissiveServiceImpl implements MissiveService {
         }
     }
 
-    @Override
-    public MissiveDTO updateMissive(MissiveDTO missiveDTO) {
-        //check if the dto id is not null (we don't check if the chat id and the sender id are not null because they are not changeable)
-        missiveValidator.validateId(missiveDTO.getId(), HttpMethod.PUT);
-        Optional<Missive> missiveOptional = missiveRepository.findById(missiveDTO.getId());
-        //validate
-        missiveValidator.validate(
-                missiveDTO,
-                HttpMethod.PUT,
-                new LinkedHashMap<>(
-                        Map.of("missive", missiveOptional.isPresent())
-                )
-        );
-        //get the previous missive
-        Missive previousMissive = missiveOptional.get();
-        //map the new missive dto to an entity
-        Missive missive = mapper.map(missiveDTO, Missive.class);
-        //set not changeable values
-        missive.setSenderId(previousMissive.getSenderId());
-        missive.setChat(previousMissive.getChat());
-        missive.setCreatedAt(previousMissive.getCreatedAt());
-        missive.setSentAt(previousMissive.getSentAt());
-        missive.setReadAt(previousMissive.getReadAt());
-        missive.setDeletedAt(previousMissive.getDeletedAt());
-        missive.setRead(previousMissive.isRead());
-        //set default values
-        missive.setUpdatedAt(LocalDateTime.now());
-        //save missive
-        return mapper.map(this.missiveRepository.save(missive), MissiveDTO.class);
-    }
 
     @Override
     public void deleteMissive(Long id) {
@@ -152,7 +149,6 @@ public class MissiveServiceImpl implements MissiveService {
 
     private final ModelMapper mapper;
     private final MissiveValidator missiveValidator;
-    private final ChatRepository chatRepository;
     private final MissiveRepository missiveRepository;
     private final MissiveSpecification missiveSpecification;
 }
